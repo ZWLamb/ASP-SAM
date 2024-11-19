@@ -12,7 +12,7 @@ from typing import List, Tuple, Type
 
 from ...common import LayerNorm2d
 
-from .upsample_adapter_block import AdapterDecoder
+from .ag_decoder_block import AGDecoder
 
 class MaskDecoder(nn.Module):
     def __init__(
@@ -73,7 +73,7 @@ class MaskDecoder(nn.Module):
         depth = 2
         start_channel = 32
         self.blocks = nn.ModuleList([
-            AdapterDecoder(in_channels=int(start_channel / (2 ** i) ** 2), scale=2)
+            AGDecoder(in_channels=int(start_channel / (2 ** i) ** 2), scale=2)
             for i in range(depth)])
         ##
         # self.activation = nn.Softmax()

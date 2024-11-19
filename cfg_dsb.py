@@ -4,8 +4,8 @@ import argparse
 def parse_args():    
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-net', type=str, default='mobile_sam', help='net type')
-    parser.add_argument('-encoder', type=str, default='tiny_vit', help='encoder type')#mobile_sam
+    parser.add_argument('-net', type=str, default='sam', help='net type')
+    parser.add_argument('-encoder', type=str, default='vit_h', help='encoder type')
     parser.add_argument('-mod', type=str, default='sam_adpt', help='mod type:seg,cls,val_ad')
     parser.add_argument('-type', type=str, default='map', help='condition type:ave,rand,rand_map')
     parser.add_argument('-vis', type=int, default=1, help='visualization')

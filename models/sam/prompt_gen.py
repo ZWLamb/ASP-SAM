@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from models.MobileSAMv2.mobilesamv2.pvtv2 import pvt_v2_b2
+from models.pvtv2 import pvt_v2_b2
 
 from timm.models import named_apply
 from functools import partial

@@ -1,8 +1,3 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
 
 from typing import Any, Optional, Tuple, Type
 
@@ -22,27 +17,13 @@ class PromptEncoder(nn.Module):
         mask_in_chans: int,
         activation: Type[nn.Module] = nn.GELU,
     ) -> None:
-        """
-        Encodes prompts for input to SAM's mask decoder.
-
-        Arguments:
-          embed_dim (int): The prompts' embedding dimension
-          image_embedding_size (tuple(int, int)): The spatial size of the
-            image embedding, as (H, W).
-          input_image_size (int): The padded size of the image as input
-            to the image encoder, as (H, W).
-          mask_in_chans (int): The number of hidden channels used for
-            encoding input masks.
-          activation (nn.Module): The activation to use when encoding
-            input masks.
-        """
         super().__init__()
         self.embed_dim = embed_dim
         self.input_image_size = input_image_size
         self.image_embedding_size = image_embedding_size
         self.pe_layer = PositionEmbeddingRandom(embed_dim // 2)
 
-        self.num_point_embeddings: int = 4  # pos/neg point + 2 box corners
+        self.num_point_embeddings: int = 4
         point_embeddings = [nn.Embedding(1, embed_dim) for i in range(self.num_point_embeddings)]
         self.point_embeddings = nn.ModuleList(point_embeddings)
         self.not_a_point_embed = nn.Embedding(1, embed_dim)
@@ -60,14 +41,6 @@ class PromptEncoder(nn.Module):
         self.no_mask_embed = nn.Embedding(1, embed_dim)
 
     def get_dense_pe(self) -> torch.Tensor:
-        """
-        Returns the positional encoding used to encode point prompts,
-        applied to a dense set of points the shape of the image encoding.
-
-        Returns:
-          torch.Tensor: Positional encoding with shape
-            1x(embed_dim)x(embedding_h)x(embedding_w)
-        """
         return self.pe_layer(self.image_embedding_size).unsqueeze(0)
 
     def _embed_points(
@@ -100,9 +73,14 @@ class PromptEncoder(nn.Module):
         return corner_embedding
 
     def _embed_masks(self, masks: torch.Tensor) -> torch.Tensor:
-        """Embeds mask inputs."""
         mask_embedding = self.mask_downscaling(masks)
         return mask_embedding
+
+    def _embed_scale_masks(self, scale_masks: torch.Tensor) -> torch.Tensor:
+        """Embeds scale_mask inputs."""
+        scale_prompt_embedding = self.mask_downscaling(scale_masks)
+        return scale_prompt_embedding
+
 
     def _get_batch_size(
         self,
@@ -130,6 +108,7 @@ class PromptEncoder(nn.Module):
         points: Optional[Tuple[torch.Tensor, torch.Tensor]],
         boxes: Optional[torch.Tensor],
         masks: Optional[torch.Tensor],
+        scale_masks: Optional[torch.Tensor]
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Embeds different types of prompts, returning both sparse and dense
@@ -140,7 +119,7 @@ class PromptEncoder(nn.Module):
             and labels to embed.
           boxes (torch.Tensor or none): boxes to embed
           masks (torch.Tensor or none): masks to embed
-
+          scale_masks (torch.Tensor):scale masks to embed
         Returns:
           torch.Tensor: sparse embeddings for the points and boxes, with shape
             BxNx(embed_dim), where N is determined by the number of input points
@@ -159,14 +138,16 @@ class PromptEncoder(nn.Module):
             sparse_embeddings = torch.cat([sparse_embeddings, box_embeddings], dim=1)
 
         if masks is not None:
-            dense_embeddings = self._embed_masks(masks)
+            dense_embeddings_from_masks = self._embed_masks(masks)#8*256*64*64
         else:
-            dense_embeddings = self.no_mask_embed.weight.reshape(1, -1, 1, 1).expand(
+            dense_embeddings_from_masks = self.no_mask_embed.weight.reshape(1, -1, 1, 1).expand(
                 bs, -1, self.image_embedding_size[0], self.image_embedding_size[1]
             )
+        if scale_masks is not None:
+            dense_embeddings = self._embed_scale_masks(scale_masks) + dense_embeddings_from_masks#8*256*64*64
+
 
         return sparse_embeddings, dense_embeddings
-
 
 class PositionEmbeddingRandom(nn.Module):
     """

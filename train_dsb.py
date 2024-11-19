@@ -26,7 +26,7 @@ def main():
         net.load_state_dict(weights,strict=False)
 
     optimizer = optim.Adam(net.parameters(), lr=args.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
-    scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.98, verbose=True, patience=20, eps=1e-8, threshold=1e-20)
+    scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.98, verbose=True, patience=5, eps=1e-8, threshold=1e-20)
 
 
     '''load pretrained model'''

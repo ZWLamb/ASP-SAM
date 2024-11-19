@@ -1,7 +1,5 @@
 import torchvision.transforms as transforms
 from .dsb import DSB
-from .liz import LIZ
-from .consep import CONSEP
 
 from torch.utils.data import DataLoader
 
