@@ -1,0 +1,7 @@
+/logs/
+/data/
+/checkpoint/
+/runs/
+/mobile_sam.pt
+/sam_vit_h.pt
+/models/pretrained_pth/pvt/pvt_v2_b2.pth
