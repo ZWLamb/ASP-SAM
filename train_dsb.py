@@ -69,8 +69,8 @@ def main():
     best_dice = 0.0
     for epoch in range(settings.EPOCH):
         if epoch and epoch < 5:
-           tol, (eiou, edice, eaji) = function.validation_sam(args, test_loader, epoch, net, writer)
-           logger.info(f'Total score: {tol}, IOU: {eiou}, DICE: {edice} || @ epoch {epoch}.')
+           tol, (edice, eaji,epq) = function.validation_sam(args, test_loader, epoch, net, writer)
+           logger.info(f'Total score: {tol}, DICE: {edice},AJI:{eaji},PQ:{epq} || @ epoch {epoch}.')
 
         net.train()
         time_start = time.time()
@@ -83,9 +83,8 @@ def main():
         net.eval()
         if epoch and epoch % args.val_freq == 0 or epoch == settings.EPOCH-1:
 
-            tol, (eiou, edice,eaji) = function.validation_sam(args, test_loader, epoch, net, writer)
-            logger.info(f'Total score: {tol}, IOU: {eiou}, DICE: {edice} || @ epoch {epoch}.')
-
+            tol, (edice,eaji,epq) = function.validation_sam(args, test_loader, epoch, net, writer)
+            logger.info(f'Total score: {tol}, DICE: {edice} ,AJI: {eaji},PQ:{epq}|| @ epoch {epoch}.')
 
             if args.distributed != 'none':
                 sd = net.module.state_dict()

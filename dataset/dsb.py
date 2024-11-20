@@ -40,37 +40,12 @@ class DSB(Dataset):
         image = (sample[:, :, :3] * 255.0).astype(np.uint8)
         inst_mask = sample[:, :, 3]
         nuclear_mask = sample[:, :, 4][np.newaxis, :]
-        # type_mask = sample[:, :, 6]
         scale_mask = log_with_condition(sample[:, :, 7])[np.newaxis, :]
-
-        #centroid_prob_mask = self.distance_transform(sample[:, :, 3])  # 每个像素点到边界的欧式距离
-
-        # if np.max(centroid_prob_mask) == 0:
-        #     pass
-        # else:
-        #     centroid_prob_mask = (centroid_prob_mask /
-        #                           np.max(centroid_prob_mask)) * 1.0  # 每个像素到边界距离的归一化
-
-        # mask = np.zeros((nuclear_mask.shape[0], nuclear_mask.shape[0], 4))
-        # mask[:, :, 0] = nuclear_mask  # bin_mask
-        # mask[:, :, 1] = centroid_prob_mask  # 每个像素到边界距离的归一化
-        # mask[:, :, 2] = inst_map  # 实例索引
-        # mask[:, :, 3] = scale_mask  # 尺度map
-
-
-        # apply preprocessing
-        # if self.preprocessing:
-        #     image = image / 255.0
-        #     sample = self.preprocessing(image=image)  # transpose 255*255*3 --> 3*255*255
-        #     image = sample["image"]
 
         pt = np.array([0, 0], dtype=np.int32)
 
-        # if self.transform:
         image = image.transpose(2,0,1)
-
         box_cup = [0, 0, 0, 0]
-
         image_meta_dict = {'filename_or_obj': name}
         return {
             'name':name,

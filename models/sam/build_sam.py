@@ -1,5 +1,3 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
 from .prompt_gen import ScalePromptGenNet
 
 import urllib.request

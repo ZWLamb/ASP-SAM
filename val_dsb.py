@@ -1,9 +1,3 @@
-#!/usr/bin/env	python3
-
-""" valuate network using pytorch
-    Lang Yi
-"""
-
 import os
 import sys
 import argparse
@@ -59,15 +53,15 @@ def main():
     logger.info(args)
 
     '''data prepare'''
-    # test_loader,_ = get_dataloader(args)
     _,test_loader = get_dataloader(args)
 
     '''valuation'''
     if args.mod == 'sam_adpt':
         net.eval()
-        tol, (eiou, edice,eaji) = function.validation_sam(args, test_loader, start_epoch, net)
-        logger.info(f'Total score: {tol}, IOU: {eiou}, DICE: {edice},AJI: {eaji} || @ epoch {start_epoch}.')
-    #IOU: 0.8802513092095298, DICE: 0.9308728058087198,AJI: 0.7566345467884432 || @ epoch 131.
-    #IOU: 0.772394071274934, DICE: 0.8623078536631456,AJI: 0.6124390383169842 || @ epoch 131.
+        tol, (edice,eaji,epq) = function.validation_sam(args, test_loader, start_epoch, net)
+        logger.info(f'Total score: {tol}, DICE: {edice},AJI: {eaji},PQ:{epq} || @ epoch {start_epoch}.')
+    #DSB     DICE: 0.93091324829536935,AJI: 0.756618987885321375,PQ:0.74384320482745632
+    #MoNuSeg DICE: 0.85703477632958764,AJI: 0.508903847576684113,PQ:0.50659374751029468
+    #GlaS    DICE: 0.91927013723857629,AJI: 0.736702857672964612,PQ:0.72918243766949212
 if __name__ == '__main__':
     main()

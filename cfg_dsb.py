@@ -52,11 +52,13 @@ def parse_args():
     type=str,
     default='./data/dsb2018',
     help='The path of segmentation data')
-    parser.add_argument('-exp_name', default='DSB-MSAdapt', type=str, help='net type')
+    parser.add_argument('-exp_name', default='DSB-ASPSAM', type=str, help='net type')
     parser.add_argument('-dataset', default='DSB' ,type=str,help='dataset name')
 
     #no-pretrain
-    parser.add_argument('-weights', type=str, default = 0, help='the weights file you want to test') #mobile_SAM Training
+    #parser.add_argument('-weights', type=str, default = 0, help='the weights file you want to test')
+    parser.add_argument('-weights', type=str, default = '/home/lang/work/ASP-SAM/logs/DSB-ASPSAM_2024_11_20_21_03_52/Model/best_dice_checkpoint.pth', help='the weights file you want to test') #mobile_SAM Training
+
 
     opt = parser.parse_args()
 

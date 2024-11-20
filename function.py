@@ -30,14 +30,11 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import cfg_dsb as cfg  ####
-#from models.discriminatorlayer import discriminator
+import cfg_dsb as cfg
 from conf import settings
 from utils import vis_image,eval_seg
 
-# from lucent.modelzoo.util import get_model_layers
-# from lucent.optvis import render, param, transform, objectives
-# from lucent.modelzoo import inceptionv1
+
 
 args = cfg.parse_args()
 
@@ -87,7 +84,6 @@ def train_sam(args, net: nn.Module, optimizer, train_loader,
             point_labels = pack['p_label']
             name = pack['image_meta_dict']['filename_or_obj']
 
-            #prompts = torchvision.transforms.Resize((64, 64))(sc_mask)#8*1*256*256
             ind += 1
 
             if point_labels.clone().flatten()[0] != -1:
@@ -113,7 +109,7 @@ def train_sam(args, net: nn.Module, optimizer, train_loader,
                     
             imge= net.image_encoder(imgs)
 
-            prompts,_ = net.prompt_gen(imgs) #TODO:对_做监督 或者 修改L136 masks的维度输入
+            prompts,_ = net.prompt_gen(imgs)
 
             for n, value in net.prompt_gen.named_parameters():
                 if 'backbone' in n:
@@ -174,18 +170,10 @@ def train_sam(args, net: nn.Module, optimizer, train_loader,
             pbar.set_postfix(**{'loss (batch)': loss.item()})
             epoch_loss += loss.item()
 
-            # nn.utils.clip_grad_value_(net.parameters(), 0.1)
 
             loss.backward()
             optimizer.step()
-            # scheduler.step()
             optimizer.zero_grad()
-
-
-
-            # 输出当前学习率
-            # current_lr = scheduler.get_last_lr()[0]  # 获取当前学习率
-            # print(f'Epoch {epoch + 1}/{epoch}, Learning Rate: {current_lr:.6f}')
 
             '''vis images'''
             if vis:
@@ -196,8 +184,6 @@ def train_sam(args, net: nn.Module, optimizer, train_loader,
                     vis_image(imgs,pred,masks, os.path.join(args.path_helper['sample_path'], namecat+'epoch+' +str(epoch) + '.jpg'), reverse=False, points=showp)
 
             pbar.update()
-
-        # scheduler.step(loss_mask)
 
     return loss
 
@@ -217,7 +203,6 @@ def validation_sam(args, val_loader, epoch, net: nn.Module, clean_dir=True):
             ipt_imgs = pack['image'].to(dtype = torch.float32, device = GPUdevice)    #0~255
             nuclei_masks = pack['label'].to(dtype = torch.float32, device = GPUdevice)
             inst_mask = pack['inst_mask'].to(dtype = torch.float32, device = GPUdevice)
-            #sc_mask = pack['scale_mask'].to(dtype = torch.float32, device = GPUdevice) #8*256*256
             ptw = pack['pt']
             point_labels = pack['p_label']
             name = pack['image_meta_dict']['filename_or_obj']
@@ -240,10 +225,10 @@ def validation_sam(args, val_loader, epoch, net: nn.Module, clean_dir=True):
                     labels_torch = torch.as_tensor(point_labels, dtype=torch.int, device=GPUdevice)
                     if(len(point_labels.shape)==1): # only one point prompt
                         coords_torch, labels_torch, showp = coords_torch[None, :, :], labels_torch[None, :], showp[None, :, :]
-                    pt = (coords_torch, labels_torch) #pt prompt 提示信息 点击坐标,标签
+                    pt = (coords_torch, labels_torch)
 
                 imgs = imgs.to(dtype = mask_type,device = GPUdevice)
-                #prompts = torchvision.transforms.Resize((64, 64))(sc_mask)  # 8*1*256*256
+
 
                 '''test'''
                 with torch.no_grad():
@@ -269,8 +254,8 @@ def validation_sam(args, val_loader, epoch, net: nn.Module, clean_dir=True):
                         pred, _ = net.mask_decoder(
                             image_embeddings=imge,
                             image_pe=net.prompt_encoder.get_dense_pe(), 
-                            sparse_prompt_embeddings=se,#1*3*256 #稀疏
-                            dense_prompt_embeddings=de, #1*256*64*64 #稠密
+                            sparse_prompt_embeddings=se,#1*3*256 #
+                            dense_prompt_embeddings=de, #1*256*64*64 #
                             multimask_output=False,
                         )
                     elif args.net == "efficient_sam":
@@ -287,8 +272,6 @@ def validation_sam(args, val_loader, epoch, net: nn.Module, clean_dir=True):
                             multimask_output=False,
                         )
 
-                    # Resize to the ordered output size
-                    #pred = F.interpolate(pred[:,:2,:,:],size=(args.out_size,args.out_size))
                     tot += lossfunc(pred, masks)
 
                     '''vis images'''
@@ -302,13 +285,10 @@ def validation_sam(args, val_loader, epoch, net: nn.Module, clean_dir=True):
                         vis_image(imgs,pred, masks, os.path.join(args.path_helper['sample_path'], namecat+'epoch+' +str(epoch) + '.jpg'), reverse=False, points=showp)
                     
 
-                    temp = eval_seg(pred, masks, threshold,inst_mask,name)  #计算指标 返回三个指标
+                    temp = eval_seg(pred, masks, threshold,inst_mask,name)
                     mix_res = tuple([sum(a) for a in zip(mix_res, temp)])
 
             pbar.update()
-
-    # if args.evl_chunk:
-    #     n_val = n_val * (ipt_imgs.size(-1) // evl_ch)
 
     return tot/ n_val , tuple([a/n_val for a in mix_res])
 

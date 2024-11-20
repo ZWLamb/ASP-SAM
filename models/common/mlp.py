@@ -1,8 +1,6 @@
 from typing import Type
 from torch import nn
 
-# Lightly adapted from
-# https://github.com/facebookresearch/MaskFormer/blob/main/mask_former/modeling/transformer/transformer_predictor.py # noqa
 class MLPBlock(nn.Module):
     def __init__(
         self,
