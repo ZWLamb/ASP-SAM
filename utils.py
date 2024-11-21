@@ -33,7 +33,7 @@ from torch.autograd import Function, Variable
 from tqdm import tqdm
 from scipy import ndimage
 
-import cfg_dsb as cfg
+import config as cfg
 
 args = cfg.parse_args()
 device = torch.device('cuda', args.gpu_device)

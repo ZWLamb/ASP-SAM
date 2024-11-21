@@ -30,7 +30,7 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import cfg_dsb as cfg
+import config as cfg
 from conf import settings
 from utils import vis_image,eval_seg
 

@@ -20,7 +20,7 @@ from tensorboardX import SummaryWriter
 from dataset import *
 from conf import settings
 import time
-import cfg_dsb
+import config
 from tqdm import tqdm
 from torch.utils.data import DataLoader, random_split
 from utils import *
@@ -30,7 +30,7 @@ import function
 
 
 def main():
-    args = cfg_dsb.parse_args()
+    args = config.parse_args()
     GPUdevice = torch.device('cuda', args.gpu_device)
     net = get_network(args, args.net, use_gpu=args.gpu, gpu_device=GPUdevice, distribution = args.distributed)
 

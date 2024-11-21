@@ -1,4 +1,4 @@
-# train_dsb.py
+# train.py
 
 import os
 import time
@@ -7,7 +7,7 @@ import torch
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 
-import cfg_dsb
+import config
 import function
 from conf import settings
 from dataset import *
@@ -16,7 +16,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 def main():
 
-    args = cfg_dsb.parse_args()
+    args = config.parse_args()
 
     GPUdevice = torch.device('cuda', args.gpu_device)
 
