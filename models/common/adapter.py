@@ -12,7 +12,6 @@ class Adapter(nn.Module):
         self.D_fc2 = nn.Linear(D_hidden_features, D_features)
         
     def forward(self, x):
-        # x is (BT, HW+1, D)
         xs = self.D_fc1(x)
         xs = self.act(xs)
         xs = self.D_fc2(xs)

@@ -6,12 +6,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 
-from ...common import Adapter, LayerNorm2d
+from ...common import Adapter
 
 
 class AdapterBlock(nn.Module):
-    """Transformer blocks with support of window attention and residual propagation blocks"""
-
     def __init__(
         self,
         args,
@@ -109,8 +107,6 @@ class AdapterBlock(nn.Module):
 
 
 class Attention(nn.Module):
-    """Multi-head Attention block with relative position embeddings."""
-
     def __init__(
         self,
         dim: int,
