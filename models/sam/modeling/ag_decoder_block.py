@@ -49,9 +49,6 @@ class AGDecoder(nn.Module):
 
         self.AdapterLocal = nn.Conv2d(in_channels, int(in_channels/2), 1)
         normal_init(self.AdapterLocal, std=0.001)
-        if dyscope:
-            self.scope = nn.Conv2d(in_channels, out_channels, 1)
-            constant_init(self.scope, val=0.)
 
         self.AdapterGateGenerator = GateGenerator(in_channels_de)
         self.AdapterPreUpsample = nn.Conv2d(int(in_channels/2), in_channels, 1)
