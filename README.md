@@ -4,7 +4,7 @@ For our experiments, we utilized the Anaconda package manager and included an `e
 conda env create -f env.yml
 conda activate asp_sam
 ```
-### Prepare weight file
+### Prepare weight files
 Download the weight file from [https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth), 
 rename it to `sam_vit_h.pt`, and place it in the root directory.
 ```console
